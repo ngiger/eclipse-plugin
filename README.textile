@@ -1,4 +1,4 @@
-# Eclipse::Plugin
+h1. Eclipse::Plugin
 
 A Ruby Gem to extract information about views, properties and perspectives from an eclipse plugin or a workspace
 
@@ -6,7 +6,7 @@ Use it at your own risk, as it is just a small utility gem to help for some rele
 
 But I have an open ear for suggestions for improvements, especially if they come with a patch including specs.
 
-## Installation
+h2. Installation
 
 Add this line to your application's Gemfile:
 
@@ -20,7 +20,7 @@ Or install it yourself as:
 
     $ gem install eclipse-plugin
 
-## Usage
+h2. Usage
 
   require 'eclipse/plugin'
   workspace =  Eclipse::Workspace.new('/path/to/eclipse/app')
@@ -29,7 +29,7 @@ Or install it yourself as:
 
 Or you can inspire you from the spec/*_spec.rb files to see tested examples.
   
-## Contributing
+h2. Contributing
 
 1. Fork it ( http://github.com/<my-github-username>/eclipse-plugin/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
