@@ -1,0 +1,5 @@
+0.0.2 # 2014.04.21
+  - use rubyzip < 1.0.0 to make it work with ruby 1.8.7 (which is still commonly used in MacOSX)
+
+0.0.1 # 2014.04.21
+  - initial release

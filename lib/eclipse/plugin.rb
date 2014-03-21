@@ -1,6 +1,6 @@
 require "eclipse/plugin/version"
 
-require 'zip'
+require 'zip/zip'
 require "rexml/document"
 include REXML  # so that we don't have to prefix everything with REXML::...
 
@@ -44,7 +44,7 @@ module Eclipse
         @workspace                 = File.dirname(jarname).sub(/\/plugins$/, '')
         @iso                       = iso
         @jarname                   = jarname
-        @jarfile                   = Zip::File.open(jarname)
+        @jarfile                   = Zip::ZipFile.open(jarname)
         @views                     = Hash.new
         @view_categories           = Hash.new
         @preferencePages           = Hash.new
