@@ -6,22 +6,27 @@ include REXML  # so that we don't have to prefix everything with REXML::...
 
 module Eclipse
   class Workspace
-    attr_reader :workspace_dir, :views, :view_categories, :preferencePages, :perspectives, :prefPage_categories
+    attr_reader :workspace_dir, :views, :view_categories, :preferencePages, :perspectives, :preferencePage_categories
     def initialize(workspace_dir)
       @workspace_dir             = workspace_dir
       @views                     = Hash.new
       @view_categories           = Hash.new
       @preferencePages           = Hash.new
       @perspectives              = Hash.new
-      @prefPage_categories       = Hash.new
+      @preferencePage_categories       = Hash.new
     end
     
-    def parsePluginDir(plugins_dir = File.join("plugins"))
+    def parsePluginDir(plugins_dir = File.join(@workspace_dir, "plugins"))
       name = "#{plugins_dir}/*.jar"
       Dir.glob(name).each{
         |jarname|
-          puts "Adding: #{jarname}" if $VERBOSE
-          info = Info.new(jarname)
+          info = Plugin::Info.new(jarname)
+          fields = [:views, :view_categories, :preferencePages, :perspectives, :preferencePage_categories]
+          info.views.each{ |k, v| @views[k] = v }
+          info.view_categories.each{ |k, v| @views[k] = v }
+          info.perspectives.each{ |k, v| @views[k] = v }
+          info.preferencePages.each{ |k, v| @views[k] = v }
+          info.preferencePage_categories.each{ |k, v| @views[k] = v }
       }
     end
   end
@@ -33,19 +38,18 @@ module Eclipse
       UI_View           = Struct.new('UI_View',           :id, :category, :translation)
       UI_Perspective    = Struct.new('UI_Perspective',    :id, :category, :translation)
       Category          = Struct.new('Category',    :id, :name, :translation)
-      attr_reader :iso, :views, :view_categories, :preferencePages, :perspectives
+      attr_reader :iso, :views, :view_categories, :preferencePages, :perspectives, :workspace, :preferencePage_categories
 
-      def initialize(jarname, workspace, iso='de')
-        puts "Info #{jarname} ws #{workspace} iso #{iso}" if $VERBOSE
+      def initialize(jarname, iso='de')
+        @workspace                 = File.dirname(jarname).sub(/\/plugins$/, '')
         @iso                       = iso
         @jarname                   = jarname
         @jarfile                   = Zip::File.open(jarname)
-        @workspace                 = workspace
         @views                     = Hash.new
         @view_categories           = Hash.new
         @preferencePages           = Hash.new
         @perspectives              = Hash.new
-        @prefPage_categories       = Hash.new
+        @preferencePage_categories       = Hash.new
         # we use hashes to be able to find the categories fast
         readPluginXML(File.basename(jarname))
       rescue => e # HACK: we need this to handle org.apache.commons.lang under Windows-7
@@ -72,8 +76,8 @@ module Eclipse
             category =  content.category
             cat_trans = content.translation
             text = nil
-            if @prefPage_categories[category]
-              text = "#{@prefPage_categories[category].translation}/#{content.translation}"
+            if @preferencePage_categories[category]
+              text = "#{@preferencePage_categories[category].translation}/#{content.translation}"
               puts "preferencePages #{id} category #{category.inspect} text #{cat_trans}" if $VERBOSE
             else
               text = content.translation
@@ -129,9 +133,9 @@ module Eclipse
               line_nr += 1
               id,value = line.split(' = ')
               if id and id.index(look_for) and value
-                return EclipseHelpers::my_unescape(value.sub("\r","").sub("\n",""))
+                return Helpers::unescape(value.sub("\r","").sub("\n",""))
               else id,value = line.split('=')
-                return EclipseHelpers::my_unescape(value.sub("\r","").sub("\n","")) if id and id.index(look_for)
+                return Helpers::unescape(value.sub("\r","").sub("\n","")) if id and id.index(look_for)
               end
         } if @jarfile.find_entry(properties)
         return look_for # default
@@ -181,7 +185,7 @@ module Eclipse
           name     = x.attributes['name'].sub(/^%/,'')
           id       = x.attributes['id'].sub(/^%/,'')
           category = x.attributes['category']
-          addCategory(@prefPage_categories, id, name) unless category
+          addCategory(@preferencePage_categories, id, name) unless category
           translation =  getTranslationForPlugin(name, @iso)
           puts "Adding preferences: id #{id} category #{category.inspect} translation #{translation}" if $VERBOSE
           unless category

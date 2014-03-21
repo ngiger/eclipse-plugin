@@ -1,0 +1,38 @@
+# Eclipse::Plugin
+
+A Ruby Gem to extract information about views, properties and perspectives from an eclipse plugin or a workspace
+
+Use it at your own risk, as it is just a small utility gem to help for some release engineering for the Elexis-RCP. See http://elexis.info.
+
+But I have an open ear for suggestions for improvements, especially if they come with a patch including specs.
+
+## Installation
+
+Add this line to your application's Gemfile:
+
+    gem 'eclipse-plugin'
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install eclipse-plugin
+
+## Usage
+
+  require 'eclipse/plugin'
+  workspace =  Eclipse::Workspace.new('/path/to/eclipse/app')
+  workspace.parsePluginDir
+  workspace.views.first {|view| puts view.id }
+
+Or you can inspire you from the spec/*_spec.rb files to see tested examples.
+  
+## Contributing
+
+1. Fork it ( http://github.com/<my-github-username>/eclipse-plugin/fork )
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request
