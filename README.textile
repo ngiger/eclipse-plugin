@@ -26,8 +26,7 @@ bc.   $ gem install eclipse-plugin
 
 h2. Usage
 
-bc.
-  require 'eclipse/plugin'
+bc.  require 'eclipse/plugin'
   workspace =  Eclipse::Workspace.new('/path/to/eclipse/app')
   workspace.parsePluginDir
   workspace.views.first {|view| puts view.id }
