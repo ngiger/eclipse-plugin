@@ -22,7 +22,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "simplecov"
-  if RUBY_VERSION.match(/^(1\.9|2)/)
-    spec.add_development_dependency("pry-debugger", :group => 'debugger')
-  end
 end
