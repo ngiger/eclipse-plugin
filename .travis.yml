@@ -1,6 +1,7 @@
 language: ruby
 
 script: bundle exec rake spec
+install: gem install --deployment --without debugger
 
 rvm:
   - 1.8.7
