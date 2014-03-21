@@ -13,51 +13,74 @@ module Eclipse
       @view_categories           = Hash.new
       @preferencePages           = Hash.new
       @perspectives              = Hash.new
-      @preferencePage_categories       = Hash.new
+      @preferencePage_categories = Hash.new
     end
     
     def parsePluginDir(plugins_dir = File.join(@workspace_dir, "plugins"))
-      name = "#{plugins_dir}/*.jar"
-      Dir.glob(name).each{
-        |jarname|
-          info = Plugin::Info.new(jarname)
-          fields = [:views, :view_categories, :preferencePages, :perspectives, :preferencePage_categories]
-          info.views.each{ |k, v| @views[k] = v }
-          info.view_categories.each{ |k, v| @views[k] = v }
-          info.perspectives.each{ |k, v| @views[k] = v }
-          info.preferencePages.each{ |k, v| @views[k] = v }
-          info.preferencePage_categories.each{ |k, v| @views[k] = v }
-      }
+      Dir.glob("#{plugins_dir}/*.jar").each{ |jarname| add_info(Plugin::Info.new(jarname)) }
+      show if $VERBOSE
     end
+
+    def parse_sub_dirs
+      Dir.glob("#{@workspace_dir}/*").each{
+        |item|
+          next unless File.directory?(item)
+          add_info(Plugin::Info.new(item))
+      }
+      show if $VERBOSE
+    end
+    def show
+      puts "Workspace #{@workspace_dir} with #{@views.size}/#{@view_categories.size} views #{@preferencePages.size}/#{@preferencePage_categories.size} preferencePages #{@perspectives.size} perspectives"
+    end
+    private
+      def add_info(info)
+        info.views.each{ |k, v|                       @views[k] = v }
+        info.view_categories.each{ |k, v|             @view_categories[k] = v }
+        info.perspectives.each{ |k, v|                @perspectives[k] = v }
+        info.preferencePages.each{ |k, v|             @preferencePages[k] = v }
+        info.preferencePage_categories.each{ |k, v|   @preferencePage_categories[k] = v }
+      end
   end
   
   module Plugin
     class Info
+      attr_reader :iso, :views, :view_categories, :preferencePages, :perspectives, :workspace, :preferencePage_categories
       # Some helper classes for the extension points we are interested in
       UI_PreferencePage = Struct.new('UI_PreferencePage', :id, :category, :translation)
       UI_View           = Struct.new('UI_View',           :id, :category, :translation)
       UI_Perspective    = Struct.new('UI_Perspective',    :id, :category, :translation)
       Category          = Struct.new('Category',    :id, :name, :translation)
-      attr_reader :iso, :views, :view_categories, :preferencePages, :perspectives, :workspace, :preferencePage_categories
 
-      def initialize(jarname, iso='de')
-        @workspace                 = File.dirname(jarname).sub(/\/plugins$/, '')
+      def initialize(jar_or_src, iso='de')
+        @workspace                 = File.dirname(jar_or_src).sub(/\/plugins$/, '')
         @iso                       = iso
-        @jarname                   = jarname
-        @jarfile                   = Zip::ZipFile.open(jarname)
+        @jar_or_src                = jar_or_src
         @views                     = Hash.new
         @view_categories           = Hash.new
         @preferencePages           = Hash.new
         @perspectives              = Hash.new
         @preferencePage_categories       = Hash.new
         # we use hashes to be able to find the categories fast
-        readPluginXML(File.basename(jarname))
-      rescue => e # HACK: we need this to handle org.apache.commons.lang under Windows-7
-        puts "Skipped plugin #{File.expand_path(jarname)}"
-        puts "error was #{e.inspect}"
+        if File.directory?(jar_or_src)
+          @jarfile = nil
+          readPluginXML(jar_or_src)
+        else
+#          @jarname                   = jar_or_src
+          @jarfile                   = Zip::ZipFile.open(jar_or_src)
+          readPluginXML(File.basename(jar_or_src))
+        end
+        if false
+#      rescue => e # HACK: we need this to handle org.apache.commons.lang under Windows-7
+        puts "Skipped plugin #{File.expand_path(jar_or_src)}"
+#        puts "error was #{e.inspect}"
         puts caller
+        end
       end
 
+      def show
+        puts "Plugin: #{@jar_or_src} with #{@views.size}/#{@view_categories.size} views #{@preferencePages.size}/#{@preferencePage_categories.size} preferencePages #{@perspectives.size} perspectives"
+      end
+      
       def addCategory(hash, id, name = nil)
         return if hash[id] and hash[id].translation
         hash[id] = Category.new(id, name) unless hash[id]
@@ -125,10 +148,16 @@ module Eclipse
 
       def getTranslationForPlugin(look_for, iso)
         properties = "plugin_#{iso}.properties"
-        properties = "plugin.properties" unless @jarfile.find_entry(properties)
         puts "Looking for translation of #{look_for} in #{properties}"  if $VERBOSE
+        content = nil
+        if @jarfile
+          content = @jarfile.read(properties) if @jarfile.find_entry(properties)
+        else
+          properties = File.new(File.join(@jar_or_src, "plugin.properties")).read
+        end
+        return look_for unless content                                
         line_nr = 0
-        @jarfile.read(properties).split("\n").each {
+        content.split("\n").each {
           |line|
               line_nr += 1
               id,value = line.split(' = ')
@@ -137,13 +166,17 @@ module Eclipse
               else id,value = line.split('=')
                 return Helpers::unescape(value.sub("\r","").sub("\n","")) if id and id.index(look_for)
               end
-        } if @jarfile.find_entry(properties)
+        }
         return look_for # default
       end
 
-      def readPluginXML(plugin_xml)
-        return unless  @jarfile.find_entry('plugin.xml')
-        doc = Document.new @jarfile.read('plugin.xml')
+      def readPluginXML(plugin)
+        if @jarfile
+          return unless @jarfile.find_entry('plugin.xml')
+          doc = Document.new @jarfile.read('plugin.xml')
+        else
+          doc = Document.new File.new(File.join(plugin, 'plugin.xml')).read
+        end
         # Get all perspectives
         root = doc.root
         res = []
@@ -153,7 +186,7 @@ module Eclipse
           id = x.attributes['name'].sub(/^%/,'')
           @perspectives[id] = UI_Perspective.new(id, nil, getTranslationForPlugin(id, @iso))
         } if res and res[0] and res[0].elements
-        puts "found #{@perspectives.size} perspectives in #{plugin_xml}" if $VERBOSE
+        puts "found #{@perspectives.size} perspectives in #{plugin}" if $VERBOSE
 
         # Get all views
         res = []
@@ -194,7 +227,7 @@ module Eclipse
             @preferencePages[id]           = UI_PreferencePage.new(id, category, translation)
           end
         } if res and res[0] and res[0].elements
-        puts "#{sprintf("%-40s", File.basename(File.dirname(plugin_xml)))}: now #{@preferencePages.size} preferencePages" if $VERBOSE
+        puts "#{sprintf("%-40s", File.basename(File.dirname(plugin)))}: now #{@preferencePages.size} preferencePages" if $VERBOSE
       end
     end
   end
