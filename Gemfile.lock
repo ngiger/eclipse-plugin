@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    eclipse-plugin (0.0.2)
+    eclipse-plugin (0.1)
       rubyzip (< 1.0.0)
 
 GEM
