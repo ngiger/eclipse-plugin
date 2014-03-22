@@ -1,7 +1,6 @@
 require "eclipse/plugin/version"
 require "eclipse/helpers"
 require "eclipse/workspace"
-
 require 'zip/zip'
 require "rexml/document"
 include REXML  # so that we don't have to prefix everything with REXML::...
@@ -50,9 +49,9 @@ module Eclipse
                                doc.root.attributes['label'],
                                doc.root.attributes['version'],
                                doc.root.attributes['provider'],
-                               doc.root.elements['description'].text,
-                               doc.root.elements['license'].text.gsub(/\n\s*/, ''),
-                               doc.root.elements['copyright'].text.gsub(/\n\s*/, '')
+                               doc.root.elements['description'] ? doc.root.elements['description'].text : '',
+                               doc.root.elements['license'] ? doc.root.elements['license'].text.gsub(/\n\s*/, '') : '',
+                               doc.root.elements['copyright'] ? doc.root.elements['copyright'].text.gsub(/\n\s*/, '') : '',
                               )
         # could enumerate a lot of plugins and which other features are included
         # doc.root.elements['plugin'].attributes['id']
