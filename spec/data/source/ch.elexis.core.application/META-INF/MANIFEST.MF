@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Elexis Open Source Application
+Bundle-SymbolicName: ch.elexis.core.application;singleton:=true
+Bundle-Version: 3.0.0.qualifier
+Bundle-Vendor: elexis.info
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui;bundle-version="3.8.2",
+ ch.rgw.utility;bundle-version="3.0.0",
+ ch.elexis.core.data;bundle-version="3.0.0",
+ ch.elexis.core.ui;bundle-version="3.0.0",
+ ch.elexis.core;bundle-version="3.0.0",
+ ch.elexis.core.ui.contacts;bundle-version="3.0.0",
+ ch.elexis.core.ui.icons;bundle-version="3.0.0",
+ ch.elexis.core.ui.laboratory;bundle-version="3.0.0",
+ ch.elexis.core.ui.medication;bundle-version="3.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Import-Package: org.slf4j
+Export-Package: ch.elexis.core.application,
+ ch.elexis.core.application.perspectives
