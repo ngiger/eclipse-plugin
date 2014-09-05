@@ -61,9 +61,6 @@ module Eclipse
           @features[info.feature.symbolicName] = info.feature
           return
         end
-        if info.symbolicName == nil
-          require 'pry'; binding.pry
-        end
         return unless info.symbolicName
         @plugins[info.symbolicName] = info
         info.views.each{ |k, v|                       @views[k] = v }
