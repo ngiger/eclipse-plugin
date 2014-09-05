@@ -2,7 +2,7 @@ require "eclipse/plugin"
 
 module Eclipse
   class Workspace
-    attr_reader :workspace_dir, :views, :view_categories, :preferencePages, :perspectives, :preferencePage_categories, :plugins
+    attr_reader :workspace_dir, :views, :view_categories, :preferencePages, :perspectives, :preferencePage_categories, :plugins, :features
     def initialize(workspace_dir)
       @workspace_dir             = workspace_dir
       @views                     = Hash.new
@@ -19,11 +19,23 @@ module Eclipse
         |jarname|
         info = Plugin::Info.new(jarname)
         next unless info
-        add_info(info) 
+        add_info(info, jarname) 
       }
       show if $VERBOSE
     end
 
+    def parse
+      isInstallation = false
+      ['plugins', 'features'].each{ |subdir|
+        dir = File.join(@workspace_dir, subdir)
+        if File.directory?(dir)
+          isInstallation = true
+          parsePluginDir(dir)        
+        end
+      }
+      parse_sub_dirs unless isInstallation
+    end
+    
     def parse_sub_dirs
       Dir.glob("#{@workspace_dir}/*").each{
         |item|
@@ -33,7 +45,7 @@ module Eclipse
           next unless File.directory?(item)
           info = Plugin::Info.new(item)
           next unless info # ex. we read a feature
-          add_info(info)
+          add_info(info, item)
           if name and info.symbolicName and name != info.symbolicName
             puts "Warning: in #{item} the symbolicName (#{info.symbolicName}) of the plugin differs from the project name #{name}"
           end
@@ -44,10 +56,13 @@ module Eclipse
       puts "Workspace #{@workspace_dir} with #{@plugins.size} plugins #{@views.size}/#{@view_categories.size} views #{@preferencePages.size}/#{@preferencePage_categories.size} preferencePages #{@perspectives.size} perspectives"
     end
     private
-      def add_info(info)
+      def add_info(info, dir = nil)
         if info.feature
-          @features[info.feature.id] = info
+          @features[info.feature.symbolicName] = info.feature
           return
+        end
+        if info.symbolicName == nil
+          require 'pry'; binding.pry
         end
         return unless info.symbolicName
         @plugins[info.symbolicName] = info

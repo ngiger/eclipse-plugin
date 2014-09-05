@@ -10,32 +10,54 @@ describe 'workspace' do
   end
 
   it "should run the readme example" do
-      require 'eclipse/plugin'
-      workspace =  Eclipse::Workspace.new(@dataDir)
-      workspace.parsePluginDir
-      workspace.views.first {|view| puts view.id }
-      workspace.views.size.should == 49
-      workspace.view_categories.size.should == 7
-      workspace.preferencePages.size.should == 3
-      workspace.preferencePage_categories.size.should == 1
-      workspace.perspectives.size.should == 7
+    installation = File.expand_path(File.join(@dataDir, 'installation'))
+    File.directory?(installation).should == true
+    workspace =  Eclipse::Workspace.new(installation)
+    workspace.parse
+    workspace.views.size.should == 49
+    workspace.view_categories.size.should == 7
+    workspace.preferencePages.size.should == 3
+    workspace.preferencePage_categories.size.should == 1
+    workspace.perspectives.size.should == 7
   end
 
-  it "should work with a source workspace" do
-    plugin = File.join('/opt/src/elexis-3-core')
-    workspace =  Eclipse::Workspace.new(File.join(@dataDir, 'source'))
-    workspace.parse_sub_dirs
-    workspace.views.first.should_not be nil
+  it "should find feature from an installed application" do
+    installation = File.expand_path(File.join(@dataDir, 'installation'))
+    File.directory?(installation).should == true
+    workspace =  Eclipse::Workspace.new(installation)
+    workspace.parse
+    workspace.views.size.should == 49
+    workspace.view_categories.size.should == 7
+    workspace.preferencePages.size.should == 3
+    workspace.preferencePage_categories.size.should == 1
+    workspace.perspectives.size.should == 7
+    workspace.features.size.should == 1
+    id = 'ch.elexis.core.application.feature'
+    workspace.features.each{ 
+      |key, value|
+      key.should == id
+      value.symbolicName.should  == id
+    }
+  end
+
+  it "should work with a simulated checkout of the elexis-3-core" do
+    elexis_core = File.expand_path(File.join(@dataDir, 'source'))
+    File.directory?(elexis_core).should == true
+    workspace =  Eclipse::Workspace.new(elexis_core)
+    workspace.parse
+    workspace.features.size.should == 2
+    workspace.view_categories.size.should == 8
+    workspace.preferencePage_categories.size.should == 0
+    workspace.perspectives.size.should == 9
+    workspace.plugins.size.should == 3
+    workspace.preferencePages.size.should == 1
+    workspace.views.size.should > 3
     workspace.perspectives.first.should_not be nil
     workspace.preferencePages.first.should_not be nil
     workspace.view_categories.first.should_not be nil
     workspace.preferencePage_categories.first.should be nil
     workspace.views.size.should == 52
-    workspace.view_categories.size.should == 8
-    workspace.preferencePages.size.should == 1
-    workspace.preferencePage_categories.size.should == 0
-    workspace.perspectives.size.should == 9
-    workspace.plugins.size.should == 3
   end
+
 
 end

@@ -1,5 +1,6 @@
 require "eclipse/plugin/version"
 require "eclipse/helpers"
+require "eclipse/feature"
 require "eclipse/workspace"
 require 'zip/zip'
 require "rexml/document"
@@ -14,7 +15,6 @@ module Eclipse
       UI_PreferencePage = Struct.new('UI_PreferencePage', :id, :category, :translation)
       UI_View           = Struct.new('UI_View',           :id, :category, :translation)
       UI_Perspective    = Struct.new('UI_Perspective',    :id, :category, :translation)
-      Feature           = Struct.new('Feature',           :id, :label, :version, :provider, :description, :license, :copyright)
       Category          = Struct.new('Category',          :id, :name, :translation)
 
       # method parse copied from buildr.apache.org/lib/buildr/java/packaging.rb
@@ -42,21 +42,6 @@ module Eclipse
         sections
       end
 
-      def getFeatureInfo(content)
-        doc = Document.new(content)
-        doc.root.elements
-        @feature = Feature.new(doc.root.attributes['id'],
-                               doc.root.attributes['label'],
-                               doc.root.attributes['version'],
-                               doc.root.attributes['provider'],
-                               doc.root.elements['description'] ? doc.root.elements['description'].text : '',
-                               doc.root.elements['license'] ? doc.root.elements['license'].text.gsub(/\n\s*/, '') : '',
-                               doc.root.elements['copyright'] ? doc.root.elements['copyright'].text.gsub(/\n\s*/, '') : '',
-                              )
-        # could enumerate a lot of plugins and which other features are included
-        # doc.root.elements['plugin'].attributes['id']
-      end
-      
       def initialize(jar_or_src, iso='de')
         @workspace                 = File.dirname(jar_or_src).sub(/\/plugins$/, '')
         @iso                       = iso
@@ -73,28 +58,25 @@ module Eclipse
           readPluginXML(jar_or_src)
           mfName = File.join(jar_or_src, 'META-INF', 'MANIFEST.MF')
           featureName = File.join(jar_or_src, 'feature.xml')
-          if File.exists?(featureName)
-            getFeatureInfo(File.read(featureName))
-          elsif File.exists?(mfName)
+          if File.exists?(mfName)
             getSymbolicNameFrom(File.read(mfName))
+          elsif File.exists?(featureName)
+            @feature =  Feature::Info.new(jar_or_src)
+          elsif File.exists?(featureName)
+            @feature =  Feature::Info.new(featureName)
+          else
+            # puts "Skipping #{jar_or_src} #{featureName}"
           end
         else
           @jarfile                   = Zip::ZipFile.open(jar_or_src)
           readPluginXML(File.basename(jar_or_src))
           if @jarfile.find_entry('feature.xml')
-            getFeatureInfo(@jarfile.read('feature.xml'))
+            @feature =  Feature::Info.new(jar_or_src)
           elsif @jarfile.find_entry('META-INF/MANIFEST.MF')
             getSymbolicNameFrom(@jarfile.read('META-INF/MANIFEST.MF'))
           end
         end
 #        @nonfree = /medelexis/i.match(File.dirname(File.dirname(plugin)))
-
-        if false
-#      rescue => e # HACK: we need this to handle org.apache.commons.lang under Windows-7
-        puts "Skipped plugin #{File.expand_path(jar_or_src)}"
-#        puts "error was #{e.inspect}"
-        puts caller
-        end
       end
 
       def show
