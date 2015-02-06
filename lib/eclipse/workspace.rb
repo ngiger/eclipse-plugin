@@ -12,6 +12,7 @@ module Eclipse
       @preferencePage_categories = Hash.new
       @plugins                   = Hash.new
       @features                  = Hash.new
+      @workspace_dir
     end
 
     def parsePluginDir(plugins_dir = File.join(@workspace_dir, "plugins"))
@@ -42,7 +43,7 @@ module Eclipse
           proj = File.join(item, '.project')
           name = nil
           name = Document.new(File.new(proj).read).root.elements['name'].text if File.exists?(proj)
-          next unless File.directory?(item)
+          next unless item and File.directory?(item)
           info = Plugin::Info.new(item)
           next unless info # ex. we read a feature
           add_info(info, item)
