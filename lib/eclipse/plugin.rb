@@ -88,7 +88,7 @@ module Eclipse
         hash[id] = Category.new(id, name) unless hash[id]
         translation = getTranslationForPlugin(name, @iso) if name
         hash[id].translation = translation if name and translation
-        puts "#{File.basename(@jarname)}: Added category #{id} name #{name} tr '#{translation}'" if $VERBOSE
+        puts "Added category #{id} name #{name} tr '#{translation}'" if $VERBOSE
       end
 
       def getTranslatedPreferencePages
@@ -212,7 +212,7 @@ module Eclipse
           elsif x.attributes['name']
             category = x.attributes['category']
             translation =  getTranslationForPlugin(name, @iso)
-            puts "#{File.basename(@jarname, '.jar')}: Adding view: id #{id} category #{category.inspect} translation #{translation}" if $VERBOSE
+            puts "Adding view: id #{id} category #{category.inspect} translation #{translation}" if $VERBOSE
             unless category
               @views[id]           = UI_View.new(id, nil, translation)
             else
