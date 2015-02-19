@@ -12,7 +12,6 @@ module Eclipse
       @preferencePage_categories = Hash.new
       @plugins                   = Hash.new
       @features                  = Hash.new
-      @workspace_dir
     end
 
     def parsePluginDir(plugins_dir = File.join(@workspace_dir, "plugins"))
