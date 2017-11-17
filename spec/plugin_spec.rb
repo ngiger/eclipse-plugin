@@ -1,6 +1,6 @@
 #encoding : utf-8
+require 'pp'
 require 'spec_helper'
-
 require 'eclipse/plugin'
 
 describe 'Plugin' do

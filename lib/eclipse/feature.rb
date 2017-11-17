@@ -1,7 +1,7 @@
 require "eclipse/plugin/version"
 require "eclipse/helpers"
 require "eclipse/workspace"
-require 'zip/zip'
+require 'zip'
 require "nokogiri"
 
 module Eclipse
