@@ -29,7 +29,7 @@ module Eclipse
         if File.directory?(jar_or_src_dir)
           getFeatureInfo(File.read(featureXml))
         elsif File.exists?(jar_or_src_dir)
-          @jarfile = Zip::ZipFile.open(jar_or_src_dir)
+          @jarfile = Zip::File.open(jar_or_src_dir)
           if @jarfile.find_entry('feature.xml')
             getFeatureInfo(@jarfile.read('feature.xml'))
           else

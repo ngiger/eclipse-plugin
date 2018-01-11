@@ -2,7 +2,7 @@ require "eclipse/plugin/version"
 require "eclipse/helpers"
 require "eclipse/feature"
 require "eclipse/workspace"
-require 'zip/zip'
+require 'zip'
 require "rexml/document"
 include REXML  # so that we don't have to prefix everything with REXML::...
 
@@ -68,7 +68,7 @@ module Eclipse
             # puts "Skipping #{jar_or_src} #{featureName}"
           end
         else
-          @jarfile                   = Zip::ZipFile.open(jar_or_src)
+          @jarfile                   = Zip::File.open(jar_or_src)
           readPluginXML(File.basename(jar_or_src))
           if @jarfile.find_entry('feature.xml')
             @feature =  Feature::Info.new(jar_or_src)

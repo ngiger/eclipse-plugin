@@ -1,6 +1,6 @@
 #encoding : utf-8
-require 'pp'
 require 'spec_helper'
+
 require 'eclipse/plugin'
 
 describe 'Plugin' do
@@ -50,7 +50,7 @@ describe 'Plugin' do
     info.views[CHECK_4_VIEW].should_not be nil
     german = 'Vorlage Drucken'
     info.views[CHECK_4_VIEW].translation.should == german
-    pp info.getTranslatedViews.find_all{ |item| item.match(german) }
+    puts info.getTranslatedViews.find_all{ |item| item.match(german) }
     info.workspace.should == @installDir
     info.getTranslatedViews.find_all{ |item| item.match(german) }.should_not be nil
   end
