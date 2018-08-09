@@ -76,7 +76,7 @@ describe 'Plugin' do
   end
 
   it "should work with a source plugin" do
-    info = Eclipse::Plugin::Info.new(File.join(@dataDir, 'source', 'ch.elexis.core.ui.contacts'))
+    info = Eclipse::Plugin::Info.new(File.join(@dataDir, 'source', 'bundles', 'ch.elexis.core.ui.contacts'))
     info.jar_or_src.should_not be nil
     info.views.first.should_not be nil
     info.perspectives.first.should_not be nil

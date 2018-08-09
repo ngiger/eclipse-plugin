@@ -12,7 +12,7 @@ describe 'Feature' do
   end
 
   it "must be able to analyse a feature.xml" do
-    feature = File.join(@dataDir, 'source', FEATURE_NAME)
+    feature = File.join(@dataDir, 'source', 'features', FEATURE_NAME)
     f_info = Eclipse::Feature::Info.new(feature)
     f_info.symbolicName.should == FEATURE_NAME
     f_info.included_features.should  == ["ch.docbox.elexis.feature"]

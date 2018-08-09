@@ -29,15 +29,14 @@ module Eclipse
       ['plugins', 'features'].each{ |subdir|
         dir = File.join(@workspace_dir, subdir)
         if File.directory?(dir)
-          isInstallation = true
-          parsePluginDir(dir)        
+          isInstallation = true if parsePluginDir(dir)        
         end
       }
       parse_sub_dirs unless isInstallation
     end
     
     def parse_sub_dirs
-      Dir.glob("#{@workspace_dir}/*").each{
+      (Dir.glob("#{@workspace_dir}/*")+Dir.glob("#{@workspace_dir}/*/*")).compact.each{
         |item|
           proj = File.join(item, '.project')
           name = nil

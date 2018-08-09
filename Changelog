@@ -1,3 +1,6 @@
+0.4.2 # 2018.08.09
+  - Fix parsing new Elexis pomless layout with nested plugins/features
+
 0.0.2 # 2014.04.21
   - support parsing a source plugin/workspace
   - use rubyzip < 1.0.0 to make it work with ruby 1.8.7 (which is still commonly used in MacOSX)
