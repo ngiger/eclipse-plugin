@@ -4,7 +4,7 @@ script:
   - bundle exec rspec
   - bundle exec rake install
   
-install: bundle install --deployment --without debugger
+install: bundle install --without debugger
 
 rvm:
 #  - 2.2.x or earlier cannot run because mediawiki-butt requires at least Ruby 2.3
