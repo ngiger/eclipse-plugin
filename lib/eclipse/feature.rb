@@ -8,7 +8,7 @@ module Eclipse
   module Feature
     class Info
       attr_reader :included_plugins, :included_features
-      attr_reader :symbolicName, :id, :label, :version, :provider, :description, :license, :copyright
+      attr_reader :symbolicName, :id, :label, :version, :provider, :description, :license, :copyright, :workspace
 
       def getFeatureInfo(content)
         @included_plugins = []
@@ -28,6 +28,7 @@ module Eclipse
         featureXml = File.join(jar_or_src_dir, 'feature.xml')
         if File.directory?(jar_or_src_dir)
           getFeatureInfo(File.read(featureXml))
+          @workspace = File.dirname(featureXml)
         elsif File.exists?(jar_or_src_dir)
           @jarfile = Zip::File.open(jar_or_src_dir)
           if @jarfile.find_entry('feature.xml')

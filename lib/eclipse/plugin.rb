@@ -58,11 +58,11 @@ module Eclipse
           readPluginXML(jar_or_src)
           mfName = File.join(jar_or_src, 'META-INF', 'MANIFEST.MF')
           featureName = File.join(jar_or_src, 'feature.xml')
-          if File.exists?(mfName)
+          if File.exist?(mfName)
             getSymbolicNameFrom(File.read(mfName))
-          elsif File.exists?(featureName)
+          elsif File.exist?(featureName)
             @feature =  Feature::Info.new(jar_or_src)
-          elsif File.exists?(featureName)
+          elsif File.exist?(featureName)
             @feature =  Feature::Info.new(featureName)
           else
             # puts "Skipping #{jar_or_src} #{featureName}"
@@ -156,7 +156,7 @@ module Eclipse
           content = @jarfile.read(properties) if @jarfile.find_entry(properties)
         else
           name = File.join(@jar_or_src, "plugin.properties")
-          properties = File.new(name).read if File.exists?(name)
+          properties = File.new(name).read if File.exist?(name)
         end
         return look_for unless content                                
         line_nr = 0
@@ -186,7 +186,7 @@ module Eclipse
           doc = Document.new @jarfile.read('plugin.xml')
         else
           plugin_xml = File.join(plugin, 'plugin.xml')
-          return unless File.exists?(plugin_xml)
+          return unless File.exist?(plugin_xml)
           doc = Document.new File.new(plugin_xml).read
         end
         # Get all perspectives
