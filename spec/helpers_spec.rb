@@ -15,7 +15,7 @@ describe 'Helpers' do
        |line|
         next unless line.index('Add_Recurring_Appointment')
         unescaped = Eclipse::Helpers.unescape(line)
-        unescaped.should match /hinzufügen/
+        expect(unescaped).to match /hinzufügen/
      }
   end
 end

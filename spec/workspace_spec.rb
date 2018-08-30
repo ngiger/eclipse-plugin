@@ -11,52 +11,52 @@ describe 'workspace' do
 
   it "should run the readme example" do
     installation = File.expand_path(File.join(@dataDir, 'installation'))
-    File.directory?(installation).should == true
+    expect(File.directory?(installation)).to eq(true)
     workspace =  Eclipse::Workspace.new(installation)
     workspace.parse
-    workspace.views.size.should == 49
-    workspace.view_categories.size.should == 7
-    workspace.preferencePages.size.should == 3
-    workspace.preferencePage_categories.size.should == 1
-    workspace.perspectives.size.should == 7
+    expect(workspace.views.size).to eq(49)
+    expect(workspace.view_categories.size).to eq(7)
+    expect(workspace.preferencePages.size).to eq(3)
+    expect(workspace.preferencePage_categories.size).to eq(1)
+    expect(workspace.perspectives.size).to eq(7)
   end
 
   it "should find feature from an installed application" do
     installation = File.expand_path(File.join(@dataDir, 'installation'))
-    File.directory?(installation).should == true
+    expect(File.directory?(installation)).to eq(true)
     workspace =  Eclipse::Workspace.new(installation)
     workspace.parse
-    workspace.views.size.should == 49
-    workspace.view_categories.size.should == 7
-    workspace.preferencePages.size.should == 3
-    workspace.preferencePage_categories.size.should == 1
-    workspace.perspectives.size.should == 7
-    workspace.features.size.should == 1
+    expect(workspace.views.size).to eq(49)
+    expect(workspace.view_categories.size).to eq(7)
+    expect(workspace.preferencePages.size).to eq(3)
+    expect(workspace.preferencePage_categories.size).to eq(1)
+    expect(workspace.perspectives.size).to eq(7)
+    expect(workspace.features.size).to eq(1)
     id = 'ch.elexis.core.application.feature'
     workspace.features.each{ 
       |key, value|
-      key.should == id
-      value.symbolicName.should  == id
+      expect(key).to eq(id)
+      expect(value.symbolicName).to  eq(id)
     }
   end
 
   it "should work with a simulated checkout of the elexis-3-core" do
     elexis_core = File.expand_path(File.join(@dataDir, 'source'))
-    File.directory?(elexis_core).should == true
+    expect(File.directory?(elexis_core)).to eq(true)
     workspace =  Eclipse::Workspace.new(elexis_core)
     workspace.parse
-    workspace.features.size.should == 2
-    workspace.view_categories.size.should == 8
-    workspace.preferencePage_categories.size.should == 0
-    workspace.perspectives.size.should == 9
-    workspace.plugins.size.should == 3
-    workspace.preferencePages.size.should == 1
-    workspace.views.size.should > 3
-    workspace.perspectives.first.should_not be nil
-    workspace.preferencePages.first.should_not be nil
-    workspace.view_categories.first.should_not be nil
-    workspace.preferencePage_categories.first.should be nil
-    workspace.views.size.should == 52
+    expect(workspace.features.size).to eq(2)
+    expect(workspace.view_categories.size).to eq(8)
+    expect(workspace.preferencePage_categories.size).to eq(0)
+    expect(workspace.perspectives.size).to eq(9)
+    expect(workspace.plugins.size).to eq(3)
+    expect(workspace.preferencePages.size).to eq(1)
+    expect(workspace.views.size).to be > 3
+    expect(workspace.perspectives.first).not_to be nil
+    expect(workspace.preferencePages.first).not_to be nil
+    expect(workspace.view_categories.first).not_to be nil
+    expect(workspace.preferencePage_categories.first).to be nil
+    expect(workspace.views.size).to eq(52)
   end
 
 

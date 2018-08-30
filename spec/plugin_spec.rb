@@ -20,68 +20,68 @@ describe 'Plugin' do
   it "must be able to analyse a plugin.xml without localization" do
     plugin = File.join(@pluginsDir, JAR_WITHOUT_LOCALIZE)
     info = Eclipse::Plugin::Info.new(plugin)
-    info.preferencePages['ch.elexis.laborimport.hl7.preferences'].should_not be nil
-    info.workspace.should == @installDir
+    expect(info.preferencePages['ch.elexis.laborimport.hl7.preferences']).not_to be nil
+    expect(info.workspace).to eq(@installDir)
   end
 
   it "must be able to analyse a plugin.xml with localization" do
     plugin = File.join(@pluginsDir, IATRIX_JAR)
     info = Eclipse::Plugin::Info.new(plugin)
-    info.views['org.iatrix.views.JournalView'].should_not be nil
-    info.view_categories['org.iatrix'].should_not be nil
-    info.workspace.should == @installDir
+    expect(info.views['org.iatrix.views.JournalView']).not_to be nil
+    expect(info.view_categories['org.iatrix']).not_to be nil
+    expect(info.workspace).to eq(@installDir)
   end
 
   it "must return the perspectives" do
     plugin = File.join(@pluginsDir, APP_JAR)
     info = Eclipse::Plugin::Info.new(plugin)
-    info.perspectives[CHECK_4_PERSPECTIVE].should_not be nil
+    expect(info.perspectives[CHECK_4_PERSPECTIVE]).not_to be nil
   end
 
   it "must return the preferencePages" do
     plugin = File.join(@pluginsDir, IATRIX_JAR)
     info = Eclipse::Plugin::Info.new(plugin)
-    info.preferencePages[CHECK_4_PREFERENCE_PAGE].should_not be nil
+    expect(info.preferencePages[CHECK_4_PREFERENCE_PAGE]).not_to be nil
   end
 
   it "must return the correct translation for a view" do
     plugin = File.join(@pluginsDir, APP_JAR)
     info = Eclipse::Plugin::Info.new(plugin)
-    info.views[CHECK_4_VIEW].should_not be nil
+    expect(info.views[CHECK_4_VIEW]).not_to be nil
     german = 'Vorlage Drucken'
-    info.views[CHECK_4_VIEW].translation.should == german
+    expect(info.views[CHECK_4_VIEW].translation).to eq(german)
     puts info.getTranslatedViews.find_all{ |item| item.match(german) }
-    info.workspace.should == @installDir
-    info.getTranslatedViews.find_all{ |item| item.match(german) }.should_not be nil
+    expect(info.workspace).to eq(@installDir)
+    expect(info.getTranslatedViews.find_all{ |item| item.match(german) }).not_to be nil
   end
 
   it "must return the correct translation for a preferencePage" do
     plugin = File.join(@pluginsDir, IATRIX_JAR)
     info = Eclipse::Plugin::Info.new(plugin)
-    info.preferencePages[CHECK_4_PREFERENCE_PAGE].should_not be nil
+    expect(info.preferencePages[CHECK_4_PREFERENCE_PAGE]).not_to be nil
     german = 'Iatrix'
-    info.preferencePages[CHECK_4_PREFERENCE_PAGE].translation.should == german
-    info.workspace.should == @installDir
-    info.getTranslatedPreferencePages.find_all{ |item| item.match(german) }.should_not be nil
+    expect(info.preferencePages[CHECK_4_PREFERENCE_PAGE].translation).to eq(german)
+    expect(info.workspace).to eq(@installDir)
+    expect(info.getTranslatedPreferencePages.find_all{ |item| item.match(german) }).not_to be nil
   end
 
   it "must return the correct translation for a perspective" do
     plugin = File.join(@pluginsDir, APP_JAR)
     info = Eclipse::Plugin::Info.new(plugin)
-    info.perspectives[CHECK_4_PERSPECTIVE].should_not be nil
+    expect(info.perspectives[CHECK_4_PERSPECTIVE]).not_to be nil
     german = 'Artikel'
-    info.perspectives[CHECK_4_PERSPECTIVE].translation.should == german
-    info.workspace.should == @installDir
-    info.getTranslatedPerspectives.find_all{ |item| item.match(german) }.should_not be nil
+    expect(info.perspectives[CHECK_4_PERSPECTIVE].translation).to eq(german)
+    expect(info.workspace).to eq(@installDir)
+    expect(info.getTranslatedPerspectives.find_all{ |item| item.match(german) }).not_to be nil
   end
 
   it "should work with a source plugin" do
     info = Eclipse::Plugin::Info.new(File.join(@dataDir, 'source', 'bundles', 'ch.elexis.core.ui.contacts'))
-    info.jar_or_src.should_not be nil
-    info.views.first.should_not be nil
-    info.perspectives.first.should_not be nil
-    info.preferencePages.first.should_not be nil
-    info.view_categories.first.should_not be nil
+    expect(info.jar_or_src).not_to be nil
+    expect(info.views.first).not_to be nil
+    expect(info.perspectives.first).not_to be nil
+    expect(info.preferencePages.first).not_to be nil
+    expect(info.view_categories.first).not_to be nil
     # info.preferencePage_categories.first.should_not be nil
   end
 
